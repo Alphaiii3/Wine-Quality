@@ -12,8 +12,8 @@ from sklearn.metrics import accuracy_score, classification_report, confusion_mat
 # ========================
 @st.cache_data
 def load_data():
-    df = pd.read_csv("data\winequality-dataset_updated.csv")
-    return df
+  df = pd.read_csv("data/winequality-dataset_updated.csv")
+  return df
 
 @st.cache_resource
 def load_model():
