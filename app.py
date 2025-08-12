@@ -19,12 +19,11 @@ def load_data():
 def load_model():
     with open("model.pkl", "rb") as f:
         model = pickle.load(f)
-    with open("scaler.pkl", "rb") as f:
-        scaler = pickle.load(f)
-    return model, scaler
+    return model
+
 
 df = load_data()
-model, scaler = load_model()
+model= load_model()
 
 # ========================
 # App Title & Description
@@ -131,26 +130,31 @@ elif menu == "Model Performance":
     st.subheader("📊 Model Performance Metrics")
 
     # Prepare data
-    X = df[features]
-    y = (df['quality'] >= 7).astype(int)
-    X_s = scaler.transform(X)
-    y_pred = model.predict(X_s)
+X = df[features]
+y = (df['quality'] >= 7).astype(int)
 
-    acc = accuracy_score(y, y_pred)
-    st.write(f"**Accuracy:** {acc:.2f}")
-    st.text("Classification Report:")
-    st.text(classification_report(y, y_pred))
+# Remove scaler transform step
+# X_s = scaler.transform(X)
 
-    # Confusion matrix
-    cm = confusion_matrix(y, y_pred)
-    fig_cm, ax = plt.subplots()
-    sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", xticklabels=['Not Good', 'Good'], yticklabels=['Not Good', 'Good'], ax=ax)
-    st.pyplot(fig_cm)
+# Use X directly for prediction
+y_pred = model.predict(X)
 
-    # Dummy model comparison (if you have results for multiple models)
-    st.markdown("#### Model Comparison")
-    comp_df = pd.DataFrame({
-        'Model': ['RandomForest', 'LogisticRegression'],
-        'Accuracy': [acc, 0.85]  # Replace 0.85 with real score
-    })
-    st.dataframe(comp_df)
+acc = accuracy_score(y, y_pred)
+st.write(f"**Accuracy:** {acc:.2f}")
+st.text("Classification Report:")
+st.text(classification_report(y, y_pred))
+
+# Confusion matrix
+cm = confusion_matrix(y, y_pred)
+fig_cm, ax = plt.subplots()
+sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", 
+            xticklabels=['Not Good', 'Good'], yticklabels=['Not Good', 'Good'], ax=ax)
+st.pyplot(fig_cm)
+
+# Dummy model comparison (if you have results for multiple models)
+st.markdown("#### Model Comparison")
+comp_df = pd.DataFrame({
+    'Model': ['RandomForest', 'LogisticRegression'],
+    'Accuracy': [acc, 0.85]  # Replace 0.85 with real score
+})
+st.dataframe(comp_df)
