@@ -31,7 +31,48 @@ features = [
 ]
 
 # Navigation
-menu = st.sidebar.radio("Menu", ["Prediction", "Model Performance"])
+menu = st.sidebar.radio("Menu", ["Data Exploration", "Visualisations", "Prediction", "Model Performance"])
+
+# Data Exploration Section
+if menu == "Data Exploration":
+    st.header("📊 Dataset Overview")
+    st.write("Shape:", df.shape)
+    st.write("Columns:", df.columns.tolist())
+    st.write("Data Types:", df.dtypes)
+
+    st.markdown("#### Sample Data")
+    st.dataframe(df.head())
+
+    st.markdown("#### Filter Data")
+    quality_filter = st.multiselect("Select quality values", sorted(df['quality'].unique()))
+    if quality_filter:
+        st.dataframe(df[df['quality'].isin(quality_filter)])
+    else:
+        st.dataframe(df)
+
+# Visualisation Section
+elif menu == "Visualisations":
+    st.header("📈 Visualisations")
+
+    import plotly.express as px
+
+    # Chart 1: Histogram
+    col1 = st.selectbox("Select column for histogram", features)
+    fig1 = px.histogram(df, x=col1, nbins=30, title=f"Histogram of {col1}")
+    st.plotly_chart(fig1, use_container_width=True)
+
+    # Chart 2: Scatter plot
+    x_axis = st.selectbox("X-axis", features, index=0)
+    y_axis = st.selectbox("Y-axis", features, index=1)
+    fig2 = px.scatter(df, x=x_axis, y=y_axis, color='quality', title=f"{x_axis} vs {y_axis}")
+    st.plotly_chart(fig2, use_container_width=True)
+
+    # Chart 3: Correlation heatmap
+    corr = df[features + ['quality']].corr()
+    fig3, ax = plt.subplots()
+    sns.heatmap(corr, annot=True, cmap="coolwarm", ax=ax)
+    st.pyplot(fig3)
+
 
 # Prediction
 if menu == "Prediction":
